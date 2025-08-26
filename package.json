@@ -1,7 +1,7 @@
 {
   "name": "vela-verify-astro-plugin",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "scripts": {
     "build": "rspack build",
     "package": "cd dist && zip -r ../VelaVerify.abp ./*"
