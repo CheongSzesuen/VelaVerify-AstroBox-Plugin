@@ -1,0 +1,20 @@
+{
+    "name": "Vela快应用验证工具",
+    "icon": "icon.png",
+    "version": "1.0",
+    "description": "通用的Vela快应用验证工具",
+    "author": ["WaiJade", "OrPudding"],
+    "website": "https://github.com/CheongSzesuen/VelaVerify-AstroBox-Plugin",
+    "entry": "main.js",
+    "api_level": 1,
+    "permissions": [
+        "lifecycle",
+        "config",
+        "network",
+        "ui",
+        "native",
+        "thirdpartyapp",
+        "interconnect"
+    ],
+    "additional_files": []
+}
