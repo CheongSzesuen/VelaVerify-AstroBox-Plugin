@@ -77,7 +77,7 @@ async function ICSend() {
 
   try {
     const appList = await AstroBox.thirdpartyapp.getThirdPartyAppList();
-    const app = appList.find(app => app.package_name === "com.verify.waijade");
+    const app = appList.find(app => app.package_name === "com.waijade.verify");
     
     if (!app) {
       updateStatus("请确保设备已连接且应用已安装");
@@ -85,7 +85,7 @@ async function ICSend() {
     }
 
     await AstroBox.interconnect.sendQAICMessage(
-      "com.verify.waijade",
+      "com.waijade.verify",
       activationData
     );
     
@@ -97,6 +97,6 @@ async function ICSend() {
 }
 
 function updateStatus(message) {
-  ui[2].content.value = message; // 注意：由于删除了两个UI元素，状态显示位置变为ui[2]
+  ui[2].content.value = message;
   AstroBox.ui.updatePluginSettingsUI(ui);
 }
