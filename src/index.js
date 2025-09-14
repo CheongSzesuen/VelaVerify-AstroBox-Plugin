@@ -1,32 +1,13 @@
 import AstroBox from "astrobox-plugin-sdk";
+
 let activationData = "";
-let packageName = "";
 let ui;
 
-// 注册功能ID
 let ICSendId = AstroBox.native.regNativeFun(ICSend);
 let InputChangeId = AstroBox.native.regNativeFun(onInputChange);
-let PackageInputChangeId = AstroBox.native.regNativeFun(onPackageInputChange);
 
 AstroBox.lifecycle.onLoad(() => {
-  // 读取保存的包名配置
-  const config = AstroBox.config.readConfig();
-  packageName = config.lastPackageName || "";
-  
   ui = [
-    {
-      node_id: "packageInput",
-      visibility: true,
-      disabled: false,
-      content: {
-        type: "Input",
-        value: {
-          text: packageName,
-          placeholder: "要验证的快应用包名",
-          callback_fun_id: PackageInputChangeId,
-        }
-      }
-    },
     {
       node_id: "activationInput",
       visibility: true,
@@ -35,7 +16,7 @@ AstroBox.lifecycle.onLoad(() => {
         type: "Input",
         value: {
           text: "",
-          placeholder: "粘贴设备ID:激活码:Base64签名",
+          placeholder: "粘贴网站返回的一长串数据包",
           callback_fun_id: InputChangeId,
         }
       }
@@ -64,7 +45,7 @@ AstroBox.lifecycle.onLoad(() => {
       disabled: false,
       content: {
         type: "Text",
-        value: "格式: 设备ID:六位激活码:Base64签名",
+        value: "数据格式为 设备ID:十二位激活码:Base64签名:包名",
       },
     },
     {
@@ -73,16 +54,7 @@ AstroBox.lifecycle.onLoad(() => {
       disabled: false,
       content: {
         type: "Text",
-        value: "包名请前往快应用管理查看应用名下方的一行字",
-      },
-    },
-    {
-      node_id: "tip",
-      visibility: true,
-      disabled: false,
-      content: {
-        type: "Text",
-        value: "格式如com.waijade.velaverify",
+        value: "例如：d4cd0dab...:DIK114514:RnsXBxiF...:cn.waijade.velaverify",
       },
     }
   ];
@@ -100,14 +72,6 @@ function onInputChange(params) {
   }
 }
 
-function onPackageInputChange(params) {
-  if (params && params.trim() !== "") {
-    packageName = params.trim();
-  } else {
-    packageName = "";
-  }
-}
-
 async function ICSend() {
   if (!activationData || activationData.trim() === "") {
     updateStatus("请先输入激活数据");
@@ -115,13 +79,15 @@ async function ICSend() {
   }
 
   const parts = activationData.split(':');
-  if (parts.length !== 3) {
-    updateStatus("数据格式错误，应为 设备ID:激活码:签名");
+  if (parts.length < 4) {
+    updateStatus("数据格式错误，应为 设备ID:激活码:签名:包名（共4部分）");
     return;
   }
 
+  const packageName = parts[parts.length - 1];
+
   if (!packageName || packageName.trim() === "") {
-    updateStatus("请先输入目标应用包名");
+    updateStatus("包名不能为空，请检查数据格式");
     return;
   }
 
@@ -136,11 +102,6 @@ async function ICSend() {
 
     await AstroBox.interconnect.sendQAICMessage(packageName, activationData);
     
-    // 发送成功后保存包名到配置
-    AstroBox.config.writeConfig({
-      lastPackageName: packageName
-    });
-    
     updateStatus("激活数据发送成功");
   } catch (error) {
     console.error("发送错误详情:", error);
@@ -149,6 +110,6 @@ async function ICSend() {
 }
 
 function updateStatus(message) {
-  ui[3].content.value = message;
+  ui[2].content.value = message;
   AstroBox.ui.updatePluginSettingsUI(ui);
 }
